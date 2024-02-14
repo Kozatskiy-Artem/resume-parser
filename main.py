@@ -1,6 +1,7 @@
 from resume_parser.dto import CriteriaDTO
 from resume_parser.exceptions import ResumeNotFoundError
 from resume_parser.work_ua_parser import WorkUaParser
+from resume_parser.robota_ua_parser import RobotaUaParser
 
 if __name__ == "__main__":
     criteria = CriteriaDTO(
@@ -12,9 +13,11 @@ if __name__ == "__main__":
         skills_and_keywords="python, selenium, rpa",
     )
 
-    parser = WorkUaParser()
+    work_ua_parser = WorkUaParser()
+    robota_ua_parser = RobotaUaParser()
 
     try:
-        parser.set_params(criteria)
+        work_ua_parser.set_params(criteria)
+        robota_ua_parser.set_params(criteria)
     except ResumeNotFoundError:
         print("Резюме кандидатів за заданими параметрами не знайдено!")
