@@ -1,5 +1,6 @@
 from time import sleep
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 
 from .dto import CriteriaDTO
@@ -92,6 +93,9 @@ class RobotaUaParser(Parser):
             "alliance-employer-cvdb-desktop-filter-keyword/santa-suggest-input/santa-drop-down/"
             "div/div[1]/santa-input/div/div[2]/div/santa-button/button",
         ).click()
+        sleep(2)
+
+        self.get_resume_links()
         sleep(5)
 
     def set_experience(self, experience: float | None) -> None:
@@ -181,3 +185,30 @@ class RobotaUaParser(Parser):
         if resume_count:
             return True
         return False
+
+    def get_resume_links(self) -> None:
+        """
+        Gets a link to all found resumes.
+
+        This method iterates through the resume cards on the page and extracts the links to the resumes.
+        It also handles pagination by clicking on the next page link until no more resumes are available.
+        """
+
+        cv_list_xpath = (
+            "/html/body/app-root/div/alliance-cv-list-page/main/article/div[1]/div/alliance-employer-cvdb-cv-list/div/"
+        )
+
+        while True:
+            resume_cards = self._try_find_element_by_xpath(cv_list_xpath + "div").find_elements(
+                By.TAG_NAME, "alliance-employer-cvdb-cv-list-card"
+            )
+            for card in resume_cards:
+                self.resume_links.append(card.find_element(By.TAG_NAME, "a").get_attribute("href"))
+
+            pagination = self.browser.find_element(By.XPATH, cv_list_xpath + "nav/santa-pagination-with-links/div")
+            current_page_number = int(pagination.find_element(By.CLASS_NAME, "active").text)
+            try:
+                pagination.find_element(By.LINK_TEXT, f"{current_page_number + 1}").click()
+            except NoSuchElementException:
+                return
+            sleep(1)
