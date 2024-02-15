@@ -1,5 +1,6 @@
 from time import sleep
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 
@@ -70,13 +71,15 @@ class WorkUaParser(Parser):
 
         search_candidates_button = self.browser.find_element(By.XPATH, "//*[@id='sm-but']")
         search_candidates_button.click()
-        sleep(5)
+        sleep(3)
 
         self.set_salary(params.salary_from, params.salary_to)
         sleep(1)
 
         self.set_experience(params.experience)
-        sleep(5)
+        sleep(1)
+
+        self.get_resume_links()
 
     def set_experience(self, experience: float | None) -> None:
         """
@@ -119,3 +122,25 @@ class WorkUaParser(Parser):
         select_salary_to = Select(self._try_find_element_by_xpath("//*[@id='salaryto_selection']"))
 
         self._try_select_by_value(select=select_salary_to, value=SALARY[salary_to])
+
+    def get_resume_links(self) -> None:
+        """
+        Gets a link to all found resumes.
+
+        This method iterates through the resume cards on the page and extracts the links to the resumes.
+        It also handles pagination by clicking on the next page link until no more resumes are available.
+        """
+
+        while True:
+            resume_cards = self._try_find_element_by_xpath("//*[@id='pjax-resume-list']").find_elements(
+                By.CLASS_NAME, "resume-link"
+            )
+            for card in resume_cards:
+                self.resume_links.append(card.find_element(By.TAG_NAME, "a").get_attribute("href"))
+
+            pagination = self.browser.find_element(By.XPATH, "//*[@id='pjax-resume-list']/nav/ul[1]")
+            try:
+                pagination.find_element(By.CLASS_NAME, "add-left-default").find_element(By.TAG_NAME, "a").click()
+            except NoSuchElementException:
+                return
+            sleep(1)

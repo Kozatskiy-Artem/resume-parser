@@ -34,6 +34,7 @@ class Parser(metaclass=ABCMeta):
         Initializes the WebDriver.
         """
 
+        self.resume_links = []
         self.browser = webdriver.Chrome()
         self.browser.maximize_window()
 

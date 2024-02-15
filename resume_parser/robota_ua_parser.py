@@ -43,12 +43,13 @@ class RobotaUaParser(Parser):
             ResumeNotFoundError: If the resume is not found.
         """
 
-        search_elements_xpath = "/html/body/app-root/div/alliance-employer-home-page/div/main/div[2]/" \
-                                "alliance-employer-home-page-growth/alliance-employer-home-page-search/section/"
+        search_elements_xpath = (
+            "/html/body/app-root/div/alliance-employer-home-page/div/main/div[2]/"
+            "alliance-employer-home-page-growth/alliance-employer-home-page-search/section/"
+        )
 
         position_input = self.browser.find_element(
-            By.XPATH,
-            search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/santa-input/div/input"
+            By.XPATH, search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/santa-input/div/input"
         )
         position_input.send_keys(params.position)
         sleep(1)
@@ -57,13 +58,13 @@ class RobotaUaParser(Parser):
             self.browser.find_element(
                 By.XPATH,
                 search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/"
-                "santa-input/div/div[2]/alliance-employer-home-page-filter-city/santa-drop-down"
+                "santa-input/div/div[2]/alliance-employer-home-page-filter-city/santa-drop-down",
             ).click()
             sleep(1)
             location_input = self.browser.find_element(
                 By.XPATH,
                 search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/santa-input/div/div[2]/"
-                "alliance-employer-home-page-filter-city/santa-drop-down/div/div[2]/div/div[1]/santa-input/div/input"
+                "alliance-employer-home-page-filter-city/santa-drop-down/div/div[2]/div/div[1]/santa-input/div/input",
             )
             location_input.send_keys(params.location)
             sleep(1)
@@ -89,7 +90,8 @@ class RobotaUaParser(Parser):
             By.XPATH,
             "/html/body/div/div[3]/div/div/alliance-employer-cvdb-header-filters/section/div/"
             "alliance-employer-cvdb-desktop-filter-keyword/santa-suggest-input/santa-drop-down/"
-            "div/div[1]/santa-input/div/div[2]/div/santa-button/button").click()
+            "div/div[1]/santa-input/div/div[2]/div/santa-button/button",
+        ).click()
         sleep(5)
 
     def set_experience(self, experience: float | None) -> None:
@@ -100,10 +102,12 @@ class RobotaUaParser(Parser):
             experience (float | None): The experience level to filter resumes. If None, no filter is applied.
         """
 
-        experience_checkbox_xpath = "/html/body/app-root/div/alliance-cv-list-page/main/article/div[2]/" \
-                                    "alliance-employer-cvdb-vertical-filters-sidebar/div/" \
-                                    "alliance-employer-cvdb-vertical-filters-panel/div/div[5]/div[2]/" \
-                                    "alliance-employer-cvdb-simple-experience/lib-checkbox-recursive-list/"
+        experience_checkbox_xpath = (
+            "/html/body/app-root/div/alliance-cv-list-page/main/article/div[2]/"
+            "alliance-employer-cvdb-vertical-filters-sidebar/div/"
+            "alliance-employer-cvdb-vertical-filters-panel/div/div[5]/div[2]/"
+            "alliance-employer-cvdb-simple-experience/lib-checkbox-recursive-list/"
+        )
 
         if experience is None:
             return
@@ -139,10 +143,12 @@ class RobotaUaParser(Parser):
             salary_to (int | None): The maximum salary range.
         """
 
-        salary_inputs_xpath = "/html/body/app-root/div/alliance-cv-list-page/main/article/div[2]/" \
-                              "alliance-employer-cvdb-vertical-filters-sidebar/div/" \
-                              "alliance-employer-cvdb-vertical-filters-panel/div/div[4]/" \
-                              "alliance-employer-cvdb-simple-salary/lib-input-range/div/"
+        salary_inputs_xpath = (
+            "/html/body/app-root/div/alliance-cv-list-page/main/article/div[2]/"
+            "alliance-employer-cvdb-vertical-filters-sidebar/div/"
+            "alliance-employer-cvdb-vertical-filters-panel/div/div[4]/"
+            "alliance-employer-cvdb-simple-salary/lib-input-range/div/"
+        )
 
         if salary_from:
             input_salary_from = self._try_find_element_by_xpath(salary_inputs_xpath + "div[1]/santa-input/div/input")
@@ -164,11 +170,13 @@ class RobotaUaParser(Parser):
         - bool: True if resumes are found, False otherwise.
         """
 
-        resume_count = int(self.browser.find_element(
-            By.XPATH,
-            "/html/body/app-root/div/alliance-cv-list-page/main/article/div[1]/"
-            "alliance-employer-cvdb-search-header/section/div/p/span"
-        ).text)
+        resume_count = int(
+            self.browser.find_element(
+                By.XPATH,
+                "/html/body/app-root/div/alliance-cv-list-page/main/article/div[1]/"
+                "alliance-employer-cvdb-search-header/section/div/p/span",
+            ).text
+        )
 
         if resume_count:
             return True

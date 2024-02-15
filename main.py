@@ -1,15 +1,15 @@
 from resume_parser.dto import CriteriaDTO
 from resume_parser.exceptions import ResumeNotFoundError
-from resume_parser.work_ua_parser import WorkUaParser
 from resume_parser.robota_ua_parser import RobotaUaParser
+from resume_parser.work_ua_parser import WorkUaParser
 
 if __name__ == "__main__":
     criteria = CriteriaDTO(
         position="Developer",
         location="Харків",
-        salary_from=15000,
-        salary_to=40000,
-        experience=0.6,
+        salary_from=10000,
+        salary_to=100000,
+        experience=2,
         skills_and_keywords="python, selenium, rpa",
     )
 
