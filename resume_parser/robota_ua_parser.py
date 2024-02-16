@@ -147,12 +147,18 @@ class RobotaUaParser(Parser):
             salary_to (int | None): The maximum salary range.
         """
 
-        salary_inputs_xpath = (
+        salary_block_xpath = (
             "/html/body/app-root/div/alliance-cv-list-page/main/article/div[2]/"
             "alliance-employer-cvdb-vertical-filters-sidebar/div/"
             "alliance-employer-cvdb-vertical-filters-panel/div/div[4]/"
-            "alliance-employer-cvdb-simple-salary/lib-input-range/div/"
         )
+        salary_inputs_xpath = salary_block_xpath + "alliance-employer-cvdb-simple-salary/lib-input-range/div/"
+
+        self.browser.execute_script("window.scrollTo(0, 500);")
+        sleep(1)
+
+        self._try_find_element_by_xpath(salary_block_xpath + "lib-without-salary/santa-toggler/label/span").click()
+        sleep(1)
 
         if salary_from:
             input_salary_from = self._try_find_element_by_xpath(salary_inputs_xpath + "div[1]/santa-input/div/input")
@@ -163,7 +169,6 @@ class RobotaUaParser(Parser):
             input_salary_to = self._try_find_element_by_xpath(salary_inputs_xpath + "div[2]/santa-input/div/input")
             input_salary_to.click()
             input_salary_to.send_keys(salary_to)
-
         sleep(1)
 
     def _is_resume_found(self) -> bool:
@@ -179,7 +184,7 @@ class RobotaUaParser(Parser):
                 By.XPATH,
                 "/html/body/app-root/div/alliance-cv-list-page/main/article/div[1]/"
                 "alliance-employer-cvdb-search-header/section/div/p/span",
-            ).text
+            ).text.replace(" ", "")
         )
 
         if resume_count:
@@ -205,9 +210,9 @@ class RobotaUaParser(Parser):
             for card in resume_cards:
                 self.resume_links.append(card.find_element(By.TAG_NAME, "a").get_attribute("href"))
 
-            pagination = self.browser.find_element(By.XPATH, cv_list_xpath + "nav/santa-pagination-with-links/div")
-            current_page_number = int(pagination.find_element(By.CLASS_NAME, "active").text)
             try:
+                pagination = self.browser.find_element(By.XPATH, cv_list_xpath + "nav/santa-pagination-with-links/div")
+                current_page_number = int(pagination.find_element(By.CLASS_NAME, "active").text)
                 pagination.find_element(By.LINK_TEXT, f"{current_page_number + 1}").click()
             except NoSuchElementException:
                 return
