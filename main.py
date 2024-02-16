@@ -18,6 +18,7 @@ if __name__ == "__main__":
 
     try:
         work_ua_parser.set_params(criteria)
+        print("*" * 30)
         robota_ua_parser.set_params(criteria)
     except ResumeNotFoundError:
         print("Резюме кандидатів за заданими параметрами не знайдено!")

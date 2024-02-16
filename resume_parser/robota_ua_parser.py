@@ -19,9 +19,12 @@ class RobotaUaParser(Parser):
 
     - __init__(): Initializes the WebDriver and navigates to the robota.ua resumes page.
     - set_params(params: CriteriaDTO): Sets the search parameters for searching resumes.
+    - set_position_and_location(self, position: str, location: str = None) -> None: Set the position and
+      location parameters, and search resume.
     - set_experience(experience: float | None) -> None: Sets the experience filter for searching resumes.
     - set_salary(salary_from: int | None, salary_to: int | None) -> None: Sets
       the experience filter for searching resumes.
+    - get_resume_links(self) -> None: Gets a link to all found resumes.
     """
 
     def __init__(self):
@@ -44,44 +47,10 @@ class RobotaUaParser(Parser):
             ResumeNotFoundError: If the resume is not found.
         """
 
-        search_elements_xpath = (
-            "/html/body/app-root/div/alliance-employer-home-page/div/main/div[2]/"
-            "alliance-employer-home-page-growth/alliance-employer-home-page-search/section/"
-        )
-
-        position_input = self.browser.find_element(
-            By.XPATH, search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/santa-input/div/input"
-        )
-        position_input.send_keys(params.position)
-        sleep(1)
-
-        if params.location:
-            self.browser.find_element(
-                By.XPATH,
-                search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/"
-                "santa-input/div/div[2]/alliance-employer-home-page-filter-city/santa-drop-down",
-            ).click()
-            sleep(1)
-            location_input = self.browser.find_element(
-                By.XPATH,
-                search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/santa-input/div/div[2]/"
-                "alliance-employer-home-page-filter-city/santa-drop-down/div/div[2]/div/div[1]/santa-input/div/input",
-            )
-            location_input.send_keys(params.location)
-            sleep(1)
-            self._try_find_element_by_xpath(
-                search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/santa-input/"
-                "div/div[2]/alliance-employer-home-page-filter-city/santa-drop-down/div/div[2]/div/div[2]/div/ul/li[1]"
-            ).click()
-
-        search_candidates_button = self.browser.find_element(By.XPATH, search_elements_xpath + "santa-button")
-        search_candidates_button.click()
-        sleep(5)
+        self.set_position_and_location(params.position, params.location)
 
         if not self._is_resume_found():
             raise ResumeNotFoundError
-
-        self._is_resume_found()
 
         self.set_experience(params.experience)
 
@@ -96,6 +65,51 @@ class RobotaUaParser(Parser):
         sleep(2)
 
         self.get_resume_links()
+        sleep(5)
+
+    def set_position_and_location(self, position: str, location: str = None) -> None:
+        """
+        Set the position and location parameters, and search resume.
+
+        Args:
+            position (str): The position or job title to search for.
+            location (str, optional): The location where the job is based. Defaults to None.
+        """
+
+        search_elements_xpath = (
+            "/html/body/app-root/div/alliance-employer-home-page/div/main/div[2]/"
+            "alliance-employer-home-page-growth/alliance-employer-home-page-search/section/"
+        )
+
+        position_input = self.browser.find_element(
+            By.XPATH, search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/santa-input/div/input"
+        )
+        position_input.send_keys(position)
+        sleep(1)
+
+        if location:
+            self.browser.find_element(
+                By.XPATH,
+                search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/santa-input/div/"
+                                        "div[2]/alliance-employer-home-page-filter-city/santa-drop-down",
+            ).click()
+            sleep(1)
+            location_input = self.browser.find_element(
+                By.XPATH,
+                search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/"
+                                        "santa-input/div/div[2]/alliance-employer-home-page-filter-city/"
+                                        "santa-drop-down/div/div[2]/div/div[1]/santa-input/div/input",
+            )
+            location_input.send_keys(location)
+            sleep(1)
+            self._try_find_element_by_xpath(
+                search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/"
+                                        "santa-input/div/div[2]/alliance-employer-home-page-filter-city/"
+                                        "santa-drop-down/div/div[2]/div/div[2]/div/ul/li[1]"
+            ).click()
+
+        search_candidates_button = self.browser.find_element(By.XPATH, search_elements_xpath + "santa-button")
+        search_candidates_button.click()
         sleep(5)
 
     def set_experience(self, experience: float | None) -> None:

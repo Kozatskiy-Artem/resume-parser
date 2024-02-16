@@ -40,9 +40,12 @@ class WorkUaParser(Parser):
 
     - __init__(): Initializes the WebDriver and navigates to the work.ua resumes page.
     - set_params(params: CriteriaDTO): Sets the search parameters for searching resumes.
+    - set_position_and_location(self, position: str, location: str = None) -> None: Set the position and
+      location parameters, and search resume.
     - set_experience(experience: float | None) -> None: Sets the experience filter for searching resumes.
     - set_salary(salary_from: int | None, salary_to: int | None) -> None: Sets
       the experience filter for searching resumes.
+    - get_resume_links(self) -> None: Gets a link to all found resumes.
     """
 
     def __init__(self):
@@ -62,16 +65,7 @@ class WorkUaParser(Parser):
             params (CriteriaDTO): Criteria data transfer object containing search parameters.
         """
 
-        position_input = self.browser.find_element(By.XPATH, "//*[@id='search']")
-        position_input.send_keys(params.position)
-
-        location_input = self.browser.find_element(By.XPATH, "//*[@id='searchform']/div/div/div[2]/input[1]")
-        self.browser.execute_script("arguments[0].value = '';", location_input)
-        location_input.send_keys(params.location)
-
-        search_candidates_button = self.browser.find_element(By.XPATH, "//*[@id='sm-but']")
-        search_candidates_button.click()
-        sleep(3)
+        self.set_position_and_location(params.position, params.location)
 
         self.set_salary(params.salary_from, params.salary_to)
         sleep(1)
@@ -80,6 +74,26 @@ class WorkUaParser(Parser):
         sleep(1)
 
         self.get_resume_links()
+
+    def set_position_and_location(self, position: str, location: str = None) -> None:
+        """
+        Set the position and location parameters, and search resume.
+
+        Args:
+            position (str): The position or job title to search for.
+            location (str, optional): The location where the job is based. Defaults to None.
+        """
+
+        position_input = self.browser.find_element(By.XPATH, "//*[@id='search']")
+        position_input.send_keys(position)
+
+        location_input = self.browser.find_element(By.XPATH, "//*[@id='searchform']/div/div/div[2]/input[1]")
+        self.browser.execute_script("arguments[0].value = '';", location_input)
+        location_input.send_keys(location)
+
+        search_candidates_button = self.browser.find_element(By.XPATH, "//*[@id='sm-but']")
+        search_candidates_button.click()
+        sleep(3)
 
     def set_experience(self, experience: float | None) -> None:
         """

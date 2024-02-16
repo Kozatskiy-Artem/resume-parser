@@ -21,10 +21,6 @@ class Parser(metaclass=ABCMeta):
 
     - __init__(): Initializes the WebDriver.
     - set_params(params: CriteriaDTO): Abstract method to set the search parameters for searching resumes.
-    - set_experience(experience: float | None) -> None: Abstract method to set
-      the experience filter for searching resumes.
-    - set_salary(salary_from: int | None, salary_to: int | None) -> None: Abstract method to set
-      the salary filter for searching resumes.
     - _try_find_element_by_xpath(xpath: str) -> WebElement: Tries to find an element on the page by XPath.
     - _try_select_by_value(select: Select, value: str) -> None: Tries to select an option by value from a dropdown menu.
     """
@@ -45,27 +41,6 @@ class Parser(metaclass=ABCMeta):
 
         Args:
             params (CriteriaDTO): Criteria data transfer object containing search parameters.
-        """
-        pass
-
-    @abstractmethod
-    def set_experience(self, experience: float | None) -> None:
-        """
-        Abstract method to set the experience filter for searching resumes.
-
-        Args:
-            experience (float | None): The experience level to filter resumes. If None, no filter is applied.
-        """
-        pass
-
-    @abstractmethod
-    def set_salary(self, salary_from: int | None, salary_to: int | None) -> None:
-        """
-        Abstract method to set the salary filter for searching resumes.
-
-        Args:
-            salary_from (int | None): The minimum salary range. If None, no filter is applied.
-            salary_to (int | None): The maximum salary range. If None, no filter is applied.
         """
         pass
 
