@@ -10,7 +10,7 @@ if __name__ == "__main__":
         salary_from=10000,
         salary_to=100000,
         experience=2,
-        skills_and_keywords="python, selenium, rpa",
+        skills_and_keywords=["python", "selenium", "rpa", "git", "php", "html", "angular", "react", "css", "ajax"],
     )
 
     work_ua_parser = WorkUaParser()
@@ -18,7 +18,8 @@ if __name__ == "__main__":
 
     try:
         work_ua_parser.set_params(criteria)
-        print("*" * 30)
+        work_ua_parser.pars_resumes(criteria)
+
         robota_ua_parser.set_params(criteria)
     except ResumeNotFoundError:
         print("Резюме кандидатів за заданими параметрами не знайдено!")

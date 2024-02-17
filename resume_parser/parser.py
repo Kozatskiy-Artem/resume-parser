@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+import fake_useragent
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -33,6 +34,8 @@ class Parser(metaclass=ABCMeta):
         self.resume_links = []
         self.browser = webdriver.Chrome()
         self.browser.maximize_window()
+        self.user_agent = fake_useragent.UserAgent()
+        self.resume_results = {}
 
     @abstractmethod
     def set_params(self, params: CriteriaDTO):

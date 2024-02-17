@@ -9,4 +9,4 @@ class CriteriaDTO(BaseModel):
     salary_from: Optional[int] = None
     salary_to: Optional[int] = None
     experience: Optional[float] = None
-    skills_and_keywords: Optional[str] = None
+    skills_and_keywords: Optional[list] = None

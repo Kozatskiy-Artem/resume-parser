@@ -91,21 +91,21 @@ class RobotaUaParser(Parser):
             self.browser.find_element(
                 By.XPATH,
                 search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/santa-input/div/"
-                                        "div[2]/alliance-employer-home-page-filter-city/santa-drop-down",
+                "div[2]/alliance-employer-home-page-filter-city/santa-drop-down",
             ).click()
             sleep(1)
             location_input = self.browser.find_element(
                 By.XPATH,
                 search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/"
-                                        "santa-input/div/div[2]/alliance-employer-home-page-filter-city/"
-                                        "santa-drop-down/div/div[2]/div/div[1]/santa-input/div/input",
+                "santa-input/div/div[2]/alliance-employer-home-page-filter-city/"
+                "santa-drop-down/div/div[2]/div/div[1]/santa-input/div/input",
             )
             location_input.send_keys(location)
             sleep(1)
             self._try_find_element_by_xpath(
                 search_elements_xpath + "santa-suggest-input/santa-drop-down/div/div[1]/"
-                                        "santa-input/div/div[2]/alliance-employer-home-page-filter-city/"
-                                        "santa-drop-down/div/div[2]/div/div[2]/div/ul/li[1]"
+                "santa-input/div/div[2]/alliance-employer-home-page-filter-city/"
+                "santa-drop-down/div/div[2]/div/div[2]/div/ul/li[1]"
             ).click()
 
         search_candidates_button = self.browser.find_element(By.XPATH, search_elements_xpath + "santa-button")
