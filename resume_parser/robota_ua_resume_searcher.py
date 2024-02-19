@@ -5,12 +5,12 @@ from selenium.webdriver.common.by import By
 
 from .dto import CriteriaDTO
 from .exceptions import ResumeNotFoundError
-from .parser import Parser
+from .interfaces import ResumeSearcherInterface
 
 
-class RobotaUaParser(Parser):
+class RobotaUaResumeSearcher(ResumeSearcherInterface):
     """
-    Class for parsing resumes on robota.ua website.
+    Class for searching resumes on robota.ua website.
 
     Attributes:
         browser (WebDriver): Instance of Selenium WebDriver.
@@ -65,7 +65,7 @@ class RobotaUaParser(Parser):
         sleep(2)
 
         self.get_resume_links()
-        sleep(5)
+        self.browser.quit()
 
     def set_position_and_location(self, position: str, location: str = None) -> None:
         """
@@ -222,7 +222,7 @@ class RobotaUaParser(Parser):
                 By.TAG_NAME, "alliance-employer-cvdb-cv-list-card"
             )
             for card in resume_cards:
-                self.resume_links.append(card.find_element(By.TAG_NAME, "a").get_attribute("href"))
+                self._resume_links.append(card.find_element(By.TAG_NAME, "a").get_attribute("href"))
 
             try:
                 pagination = self.browser.find_element(By.XPATH, cv_list_xpath + "nav/santa-pagination-with-links/div")

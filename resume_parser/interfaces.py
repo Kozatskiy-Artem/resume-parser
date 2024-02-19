@@ -11,9 +11,9 @@ from .dto import CriteriaDTO
 from .exceptions import ResumeNotFoundError
 
 
-class Parser(metaclass=ABCMeta):
+class ResumeSearcherInterface(metaclass=ABCMeta):
     """
-    Abstract base class for parsing resumes.
+    Abstract base class for searching resumes.
 
     Attributes:
     - browser (WebDriver): Instance of Selenium WebDriver.
@@ -31,11 +31,13 @@ class Parser(metaclass=ABCMeta):
         Initializes the WebDriver.
         """
 
-        self.resume_links = []
+        self._resume_links = []
         self.browser = webdriver.Chrome()
         self.browser.maximize_window()
-        self.user_agent = fake_useragent.UserAgent()
-        self.resume_results = {}
+
+    @property
+    def resume_links(self):
+        return self._resume_links
 
     @abstractmethod
     def set_params(self, params: CriteriaDTO):
@@ -85,3 +87,34 @@ class Parser(metaclass=ABCMeta):
             select.select_by_value(value)
         except NoSuchElementException:
             raise ResumeNotFoundError()
+
+
+class ResumeParserInterface(metaclass=ABCMeta):
+    """
+    An abstract base class for parsing resumes.
+
+    Attributes:
+        user_agent (fake_useragent.UserAgent): An instance of the UserAgent class for generating random user agents.
+        resume_results (dict): A dictionary to store parsed resume results.
+
+    Methods:
+        __init__(): Initializes the ResumeParserInterface class.
+        pars_resumes(resume_links: list[str], params: CriteriaDTO) -> None: Abstract method to parse resumes.
+    """
+
+    def __init__(self):
+        self.user_agent = fake_useragent.UserAgent()
+        self.resume_results = {}
+
+    @abstractmethod
+    def pars_resumes(self, resume_links: list[str], params: CriteriaDTO) -> None:
+        """
+        Abstract method to parse resumes.
+
+        Args:
+            resume_links (list[str]): A list of URLs pointing to resumes to be parsed.
+            params (CriteriaDTO): An instance of the CriteriaDTO class containing search parameters.
+
+        This method should be implemented by subclasses to parse resumes and extract relevant information.
+        """
+        pass
