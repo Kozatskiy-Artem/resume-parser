@@ -141,3 +141,23 @@ class ResumeParserInterface(metaclass=ABCMeta):
         if resume.get("education") == ResumeStatus.EDUCATION_PROVIDED:
             points += 1
         return points
+
+    def get_relevant_resumes(self, max_count: int):
+        """
+        Retrieves the most relevant resumes based on their points.
+
+        Args:
+            max_count (int): The maximum number of relevant resumes to retrieve.
+
+        Returns:
+            dict: A dictionary containing the top relevant resumes and their corresponding
+            information, sorted by relevance.
+            If the maximum count is greater than or equal to the total number of resumes,
+            the function returns all sorted resumes. Otherwise, it returns only the top resumes.
+        """
+
+        sorted_resume_results = sorted(self.resume_results.items(), key=lambda x: x[1]['points'], reverse=True)
+
+        if max_count >= len(sorted_resume_results):
+            return dict(sorted_resume_results)
+        return dict(sorted_resume_results[:max_count])

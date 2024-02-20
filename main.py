@@ -9,9 +9,9 @@ if __name__ == "__main__":
     criteria = CriteriaDTO(
         position="Developer",
         location="Харків",
-        salary_from=10000,
+        salary_from=20000,
         salary_to=100000,
-        experience=2,
+        experience=0.6,
         skills_and_keywords=["python", "selenium", "rpa", "git", "php", "html", "angular", "react", "css", "ajax"],
     )
 
@@ -28,3 +28,8 @@ if __name__ == "__main__":
     work_ua_resume_parser.pars_resumes(work_ua_searcher.resume_links, criteria)
     robota_ua_resume_parser = RobotaUaResumeParser()
     robota_ua_resume_parser.pars_resumes(robota_ua_searcher.resume_links, criteria)
+
+    work_ua_results = work_ua_resume_parser.get_relevant_resumes(7)
+    print(work_ua_results)
+    robota_ua_results = robota_ua_resume_parser.get_relevant_resumes(5)
+    print(robota_ua_results)
