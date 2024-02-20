@@ -118,3 +118,25 @@ class ResumeParserInterface(metaclass=ABCMeta):
         This method should be implemented by subclasses to parse resumes and extract relevant information.
         """
         pass
+
+    @staticmethod
+    def _get_resume_points(resume: dict):
+        """
+        Simple system for evaluating relevant resumes.
+        Calculate the points of a resume based on matching keywords, experience, and education.
+
+        Args:
+            resume (dict): The resume data dictionary.
+
+        Returns:
+            int: The total points calculated for the resume.
+        """
+
+        points = 0
+        if isinstance(resume["matching_keywords"], set):
+            points = len(resume["matching_keywords"])
+        if resume.get("experience") == "Досвід роботи вказаний":
+            points += 1
+        if resume.get("education") == "Освіта вказана":
+            points += 1
+        return points

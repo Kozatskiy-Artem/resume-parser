@@ -49,6 +49,8 @@ class RobotaUaResumeParser(ResumeParserInterface):
                 "education": self._check_education(resume_data),
             }
 
+            self.resume_results[resume_link]["points"] = self._get_resume_points(self.resume_results[resume_link])
+
     @staticmethod
     def _get_position(resume: dict) -> str:
         """

@@ -55,6 +55,8 @@ class WorkUaResumeParser(ResumeParserInterface):
                     "is_file": bool(is_file),
                 }
 
+            self.resume_results[resume_link]["points"] = self._get_resume_points(self.resume_results[resume_link])
+
     @staticmethod
     def _get_resume_is_file(resume: BeautifulSoup):
         """
