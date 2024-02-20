@@ -3,6 +3,7 @@ from typing import Union
 
 import requests
 
+from .constants import ResumeStatus
 from .dto import CriteriaDTO
 from .interfaces import ResumeParserInterface
 
@@ -89,7 +90,7 @@ class RobotaUaResumeParser(ResumeParserInterface):
                 matching_keywords.add(required_keyword)
         if len(matching_keywords):
             return matching_keywords
-        return "Збігів з ключовими словами у резюме не знайдено"
+        return ResumeStatus.NO_KEYWORD_MATCHES
 
     @staticmethod
     def _get_description_resume(resume: dict) -> str:
@@ -137,7 +138,7 @@ class RobotaUaResumeParser(ResumeParserInterface):
         """
 
         experience = resume.get("experiences")
-        return "Досвід роботи вказаний" if experience else "Досвід роботи не вказаний"
+        return ResumeStatus.EXPERIENCE_PROVIDED if experience else ResumeStatus.EXPERIENCE_NOT_PROVIDED
 
     @staticmethod
     def _check_education(resume: dict):
@@ -152,4 +153,4 @@ class RobotaUaResumeParser(ResumeParserInterface):
         """
 
         education = resume.get("educations")
-        return "Освіта вказана" if education else "Освіта не вказана"
+        return ResumeStatus.EDUCATION_PROVIDED if education else ResumeStatus.EDUCATION_NOT_PROVIDED

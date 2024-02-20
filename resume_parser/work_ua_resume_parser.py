@@ -3,6 +3,7 @@ from typing import Union
 import requests
 from bs4 import BeautifulSoup
 
+from .constants import ResumeStatus
 from .dto import CriteriaDTO
 from .interfaces import ResumeParserInterface
 
@@ -107,9 +108,9 @@ class WorkUaResumeParser(ResumeParserInterface):
                 .find_all("span", recursive=False)
             )
         except (IndexError, AttributeError):
-            return "Розділ навичок не заповнений"
+            return ResumeStatus.SKILLS_SECTION_EMPTY
         if not skills_elements:
-            return "Резюме розміщено у вигляді файлу"
+            return ResumeStatus.RESUME_AS_FILE
 
         skills = [skills_element.text.strip().lower() for skills_element in skills_elements]
         matching_skills = set()
@@ -119,7 +120,7 @@ class WorkUaResumeParser(ResumeParserInterface):
                     matching_skills.add(skill_in_resume)
         if len(matching_skills):
             return matching_skills
-        return "Збігів у розділі навичок не знайдено"
+        return ResumeStatus.NO_SKILL_MATCHES
 
     @staticmethod
     def _match_keywords(resume: BeautifulSoup, required_keywords: list[str]) -> Union[str, set]:
@@ -139,9 +140,9 @@ class WorkUaResumeParser(ResumeParserInterface):
                 resume.find("div", class_="wordwrap").find_all("div", recursive=False)[2].find_next_siblings()
             )
         except IndexError:
-            return "Резюме не заповнено"
+            return ResumeStatus.RESUME_NOT_FILLED
         if not resume_blocks:
-            return "Резюме не заповнено"
+            return ResumeStatus.RESUME_NOT_FILLED
 
         resume_text = [block.text.strip().lower() for block in resume_blocks]
         matching_keywords = set()
@@ -151,7 +152,7 @@ class WorkUaResumeParser(ResumeParserInterface):
                     matching_keywords.add(required_keyword)
         if len(matching_keywords):
             return matching_keywords
-        return "Збігів з ключовими словами у резюме не знайдено"
+        return ResumeStatus.NO_KEYWORD_MATCHES
 
     @staticmethod
     def _check_experience(resume: BeautifulSoup):
@@ -167,7 +168,7 @@ class WorkUaResumeParser(ResumeParserInterface):
         """
 
         experience = resume.find(text="Досвід роботи")
-        return "Досвід роботи вказаний" if experience else "Досвід роботи не вказаний"
+        return ResumeStatus.EXPERIENCE_PROVIDED if experience else ResumeStatus.EXPERIENCE_NOT_PROVIDED
 
     @staticmethod
     def _check_education(resume: BeautifulSoup):
@@ -182,4 +183,4 @@ class WorkUaResumeParser(ResumeParserInterface):
         """
 
         education = resume.find(text="Освіта")
-        return "Освіта вказана" if education else "Освіта не вказана"
+        return ResumeStatus.EDUCATION_PROVIDED if education else ResumeStatus.EDUCATION_NOT_PROVIDED

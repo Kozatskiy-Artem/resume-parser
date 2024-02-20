@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import Select
 
+from .constants import ResumeStatus
 from .dto import CriteriaDTO
 from .exceptions import ResumeNotFoundError
 
@@ -135,8 +136,8 @@ class ResumeParserInterface(metaclass=ABCMeta):
         points = 0
         if isinstance(resume["matching_keywords"], set):
             points = len(resume["matching_keywords"])
-        if resume.get("experience") == "Досвід роботи вказаний":
+        if resume.get("experience") == ResumeStatus.EXPERIENCE_PROVIDED:
             points += 1
-        if resume.get("education") == "Освіта вказана":
+        if resume.get("education") == ResumeStatus.EDUCATION_PROVIDED:
             points += 1
         return points
