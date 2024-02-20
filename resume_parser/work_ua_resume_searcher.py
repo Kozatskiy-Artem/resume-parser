@@ -153,8 +153,8 @@ class WorkUaResumeSearcher(ResumeSearcherInterface):
             for card in resume_cards:
                 self._resume_links.append(card.find_element(By.TAG_NAME, "a").get_attribute("href"))
 
-            pagination = self.browser.find_element(By.XPATH, "//*[@id='pjax-resume-list']/nav/ul[1]")
             try:
+                pagination = self.browser.find_element(By.XPATH, "//*[@id='pjax-resume-list']/nav/ul[1]")
                 pagination.find_element(By.CLASS_NAME, "add-left-default").find_element(By.TAG_NAME, "a").click()
             except NoSuchElementException:
                 return

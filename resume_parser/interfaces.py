@@ -156,7 +156,7 @@ class ResumeParserInterface(metaclass=ABCMeta):
             the function returns all sorted resumes. Otherwise, it returns only the top resumes.
         """
 
-        sorted_resume_results = sorted(self.resume_results.items(), key=lambda x: x[1]['points'], reverse=True)
+        sorted_resume_results = sorted(self.resume_results.items(), key=lambda x: x[1]["points"], reverse=True)
 
         if max_count >= len(sorted_resume_results):
             return dict(sorted_resume_results)
