@@ -55,9 +55,17 @@ def help_handler(message):
 
 /start - Команда щоб розпочати роботу з ботом.
 /help - Команда щоб відобразити список усіх доступних команд та їх короткий опис.
+/check - Команда щоб вивести задані параметри для пошуку резюме.
+/clear - Команда щоб очистити задані параметри.
 /find_on_work - Команда щоб виконати пошук релевантних резюме за попередньо заданими параметрами на сайті work.ua.
 /find_on_robota - Команда щоб виконати пошук релевантних резюме за попередньо заданими параметрами на сайті robota.ua.
 /find_on_all - Команда щоб виконати пошук релевантних резюме за попередньо заданими параметрами на обох платформах.
+
+Перед пошуком резюме <b>обов'язково введіть параметри</b> для пошуку. 
+Для цього використайте спеціальні кнопки на клавіатурі або напишіть вручну, наприклад, <i>Посада</i>,
+що буде сигналізувати про те, що Ви хочете вказати даний параметр.
+
+<b>Вказуйте ключові слова та навички</b>, чим більше тим краще, це дозволить виділити найбільш релевантні резюме.
         """,
     )
 
@@ -165,6 +173,40 @@ def find_resume_on_robota(message):
 def find_resume_on_all(message):
     find_resume_on_work(message)
     find_resume_on_robota(message)
+
+
+@bot.message_handler(commands=["check"])
+def check_params(message):
+    try:
+        user_responses[message.chat.id]
+    except KeyError:
+        bot.send_message(message.chat.id, "Спочатку виконайте команду /start")
+        return
+
+    bot.send_message(
+        message.chat.id,
+        f"""
+<b>Параметри пошуку резюме</b>: 
+Позиція: <i>{user_responses[message.chat.id].get('position', 'Не вказана')}</i>
+Локація: <i>{user_responses[message.chat.id].get('location', 'Не вказана')}</i>
+Досвід: <i>{user_responses[message.chat.id].get('experience', 'Не вказаний')}</i>
+Зарплата (від): <i>{user_responses[message.chat.id].get('salary_from', 'Не вказана')}</i>
+Зарплата (до): <i>{user_responses[message.chat.id].get('salary_to', 'Не вказана')}</i>
+Ключові слова: <i>{user_responses[message.chat.id].get('keywords', 'Не вказані')}</i>
+"""
+    )
+
+
+@bot.message_handler(commands=["clear"])
+def clear_params(message):
+    try:
+        user_responses[message.chat.id]
+    except KeyError:
+        bot.send_message(message.chat.id, "Спочатку виконайте команду /start")
+        return
+
+    user_responses[message.chat.id] = {}
+    bot.send_message(message.chat.id, "Параметри очищено")
 
 
 def get_criteria(message):
