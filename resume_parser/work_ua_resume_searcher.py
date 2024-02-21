@@ -88,9 +88,10 @@ class WorkUaResumeSearcher(ResumeSearcherInterface):
         position_input = self.browser.find_element(By.XPATH, "//*[@id='search']")
         position_input.send_keys(position)
 
-        location_input = self.browser.find_element(By.XPATH, "//*[@id='searchform']/div/div/div[2]/input[1]")
-        self.browser.execute_script("arguments[0].value = '';", location_input)
-        location_input.send_keys(location)
+        if location:
+            location_input = self.browser.find_element(By.XPATH, "//*[@id='searchform']/div/div/div[2]/input[1]")
+            self.browser.execute_script("arguments[0].value = '';", location_input)
+            location_input.send_keys(location)
 
         search_candidates_button = self.browser.find_element(By.XPATH, "//*[@id='sm-but']")
         search_candidates_button.click()
