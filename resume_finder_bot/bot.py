@@ -6,6 +6,8 @@ from telebot import TeleBot, types
 
 from resume_parser.dto import CriteriaDTO
 from resume_parser.exceptions import ResumeNotFoundError
+from resume_parser.robota_ua_resume_parser import RobotaUaResumeParser
+from resume_parser.robota_ua_resume_searcher import RobotaUaResumeSearcher
 from resume_parser.work_ua_resume_parser import WorkUaResumeParser
 from resume_parser.work_ua_resume_searcher import SALARY, WorkUaResumeSearcher
 
@@ -53,13 +55,15 @@ def help_handler(message):
 
 /start - Команда щоб розпочати роботу з ботом.
 /help - Команда щоб відобразити список усіх доступних команд та їх короткий опис.
-/find - Команда щоб виконати пошук релевантних резюме за попередньо заданими параметрами.
+/find_on_work - Команда щоб виконати пошук релевантних резюме за попередньо заданими параметрами на сайті work.ua.
+/find_on_robota - Команда щоб виконати пошук релевантних резюме за попередньо заданими параметрами на сайті robota.ua.
+/find_on_all - Команда щоб виконати пошук релевантних резюме за попередньо заданими параметрами на обох платформах.
         """,
     )
 
 
-@bot.message_handler(commands=["find"])
-def find_resume(message):
+@bot.message_handler(commands=["find_on_work"])
+def find_resume_on_work(message):
     try:
         user_responses[message.chat.id]
     except KeyError:
@@ -67,19 +71,12 @@ def find_resume(message):
         return
 
     try:
-        criteria = CriteriaDTO(
-            position=user_responses[message.chat.id].get("position"),
-            location=user_responses[message.chat.id].get("location"),
-            salary_from=user_responses[message.chat.id].get("salary_from"),
-            salary_to=user_responses[message.chat.id].get("salary_to"),
-            experience=user_responses[message.chat.id].get("experience"),
-            skills_and_keywords=user_responses[message.chat.id].get("keywords"),
-        )
+        criteria = get_criteria(message)
     except ValidationError:
         bot.send_message(message.chat.id, "Посада кандидата не вказана або введені некоректні дані в інших параметрах")
         return
 
-    bot.send_message(message.chat.id, "Шукаємо кандидатів, це може зайняти певний час.")
+    bot.send_message(message.chat.id, "Шукаємо кандидатів на work.ua, це може зайняти певний час.")
 
     work_ua_searcher = WorkUaResumeSearcher()
 
@@ -87,12 +84,13 @@ def find_resume(message):
         work_ua_searcher.set_params(criteria)
     except ResumeNotFoundError:
         bot.send_message(message.chat.id, "Резюме кандидатів за заданими параметрами не знайдено!")
+        return
 
     work_ua_resume_parser = WorkUaResumeParser()
     work_ua_resume_parser.pars_resumes(work_ua_searcher.resume_links, criteria)
 
     work_ua_results = work_ua_resume_parser.get_relevant_resumes(5)
-    bot.send_message(message.chat.id, "<b>Звіт пошуку кандидатів</b>")
+    bot.send_message(message.chat.id, "<b>Звіт пошуку кандидатів на work.ua</b>")
     for index, result in enumerate(work_ua_results.items()):
         if result[1]["is_file"]:
             bot.send_message(
@@ -103,7 +101,7 @@ def find_resume(message):
 - Усі ключові слова з якими знайдено співпадіння в резюме: {result[1]["matching_keywords"]}
 - Кількість балів: {result[1]["points"]}
 - Резюме завантажено файлом, а не заповнено на сайті, тому розділи навичок, освіти та досвіду не знайдені.
-                """,
+                """
             )
         else:
             bot.send_message(
@@ -116,8 +114,69 @@ def find_resume(message):
 - Навички кандидата, що співпали з вказаними: {result[1]["matching_skills"]}
 - Усі ключові слова з якими знайдено співпадіння в резюме: {result[1]["matching_keywords"]}
 - Кількість балів: {result[1]["points"]}
-                """,
+                """
             )
+
+
+@bot.message_handler(commands=["find_on_robota"])
+def find_resume_on_robota(message):
+    try:
+        user_responses[message.chat.id]
+    except KeyError:
+        bot.send_message(message.chat.id, "Спочатку виконайте команду /start")
+        return
+
+    try:
+        criteria = get_criteria(message)
+    except ValidationError:
+        bot.send_message(message.chat.id, "Посада кандидата не вказана або введені некоректні дані в інших параметрах")
+        return
+
+    bot.send_message(message.chat.id, "Шукаємо кандидатів на robota.ua, це може зайняти певний час.")
+
+    robota_ua_searcher = RobotaUaResumeSearcher()
+
+    try:
+        robota_ua_searcher.set_params(criteria)
+    except ResumeNotFoundError:
+        bot.send_message(message.chat.id, "Резюме кандидатів за заданими параметрами не знайдено!")
+        return
+
+    robota_ua_resume_parser = RobotaUaResumeParser()
+    robota_ua_resume_parser.pars_resumes(robota_ua_searcher.resume_links, criteria)
+
+    robota_ua_results = robota_ua_resume_parser.get_relevant_resumes(5)
+    bot.send_message(message.chat.id, "<b>Звіт пошуку кандидатів на robota.ua</b>")
+    for index, result in enumerate(robota_ua_results.items()):
+        bot.send_message(
+            message.chat.id,
+            f"""
+📌 Кандидат №{index + 1}
+- <b>Посада</b>: <a href="{result[0]}">{result[1]["position"]}</a>
+- {result[1]["experience"]}
+- {result[1]["education"]}
+- Усі ключові слова з якими знайдено співпадіння в резюме: {result[1]["matching_keywords"]}
+- Кількість балів: {result[1]["points"]}
+            """
+        )
+
+
+@bot.message_handler(commands=["find_on_all"])
+def find_resume_on_all(message):
+    find_resume_on_work(message)
+    find_resume_on_robota(message)
+
+
+def get_criteria(message):
+    criteria = CriteriaDTO(
+        position=user_responses[message.chat.id].get("position"),
+        location=user_responses[message.chat.id].get("location"),
+        salary_from=user_responses[message.chat.id].get("salary_from"),
+        salary_to=user_responses[message.chat.id].get("salary_to"),
+        experience=user_responses[message.chat.id].get("experience"),
+        skills_and_keywords=user_responses[message.chat.id].get("keywords"),
+    )
+    return criteria
 
 
 @bot.message_handler(content_types=["text"])
