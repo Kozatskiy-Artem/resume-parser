@@ -3,6 +3,7 @@ class ResumeStatus:
     EDUCATION_NOT_PROVIDED = "Освіта не вказана"
     EXPERIENCE_PROVIDED = "Досвід роботи вказаний"
     EXPERIENCE_NOT_PROVIDED = "Досвід роботи не вказаний"
+    KEYWORDS_NOT_PROVIDED = "Ви не вказали ключові слова для пошуку"
     SKILLS_SECTION_EMPTY = "Розділ навичок не заповнений"
     RESUME_AS_FILE = "Резюме розміщено у вигляді файлу"
     NO_SKILL_MATCHES = "Збігів у розділі навичок не знайдено"

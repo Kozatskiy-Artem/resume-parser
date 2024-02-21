@@ -89,7 +89,7 @@ class WorkUaResumeParser(ResumeParserInterface):
         return position
 
     @staticmethod
-    def _match_skills(resume: BeautifulSoup, required_skills: list[str]) -> Union[str, set]:
+    def _match_skills(resume: BeautifulSoup, required_skills: list[str] = None) -> Union[str, set]:
         """
         Matches required skills with skills listed in the resume.
 
@@ -101,6 +101,8 @@ class WorkUaResumeParser(ResumeParserInterface):
             Union[str, set]: Matching skills found in the resume.
         """
 
+        if not required_skills:
+            return ResumeStatus.KEYWORDS_NOT_PROVIDED
         try:
             skills_elements = (
                 resume.find("div", class_="wordwrap")
@@ -123,7 +125,7 @@ class WorkUaResumeParser(ResumeParserInterface):
         return ResumeStatus.NO_SKILL_MATCHES
 
     @staticmethod
-    def _match_keywords(resume: BeautifulSoup, required_keywords: list[str]) -> Union[str, set]:
+    def _match_keywords(resume: BeautifulSoup, required_keywords: list[str] = None) -> Union[str, set]:
         """
         Matches required keywords with text blocks in the resume.
 
@@ -135,6 +137,8 @@ class WorkUaResumeParser(ResumeParserInterface):
             Union[str, set]: Matching keywords found in the resume.
         """
 
+        if not required_keywords:
+            return ResumeStatus.KEYWORDS_NOT_PROVIDED
         try:
             resume_blocks = (
                 resume.find("div", class_="wordwrap").find_all("div", recursive=False)[2].find_next_siblings()

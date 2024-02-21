@@ -70,7 +70,7 @@ class RobotaUaResumeParser(ResumeParserInterface):
             position += ", " + salary + resume["currencySign"]
         return position
 
-    def _match_keywords(self, resume: dict, required_keywords: list[str]) -> Union[str, set]:
+    def _match_keywords(self, resume: dict, required_keywords: list[str] = None) -> Union[str, set]:
         """
         Matches required keywords with text blocks in the resume.
 
@@ -81,6 +81,9 @@ class RobotaUaResumeParser(ResumeParserInterface):
         Returns:
             Union[str, set]: Matching keywords found in the resume or a message indicating no matches found.
         """
+
+        if not required_keywords:
+            return ResumeStatus.KEYWORDS_NOT_PROVIDED
 
         resume_text = self._get_description_resume(resume).lower()
         matching_keywords = set()
