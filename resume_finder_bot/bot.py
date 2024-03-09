@@ -72,10 +72,7 @@ def help_handler(message):
 
 @bot.message_handler(commands=["find_on_work"])
 def find_resume_on_work(message):
-    try:
-        user_responses[message.chat.id]
-    except KeyError:
-        bot.send_message(message.chat.id, "Спочатку виконайте команду /start")
+    if not is_user_started(message):
         return
 
     try:
@@ -128,10 +125,7 @@ def find_resume_on_work(message):
 
 @bot.message_handler(commands=["find_on_robota"])
 def find_resume_on_robota(message):
-    try:
-        user_responses[message.chat.id]
-    except KeyError:
-        bot.send_message(message.chat.id, "Спочатку виконайте команду /start")
+    if not is_user_started(message):
         return
 
     try:
@@ -177,10 +171,7 @@ def find_resume_on_all(message):
 
 @bot.message_handler(commands=["check"])
 def check_params(message):
-    try:
-        user_responses[message.chat.id]
-    except KeyError:
-        bot.send_message(message.chat.id, "Спочатку виконайте команду /start")
+    if not is_user_started(message):
         return
 
     bot.send_message(
@@ -199,10 +190,7 @@ def check_params(message):
 
 @bot.message_handler(commands=["clear"])
 def clear_params(message):
-    try:
-        user_responses[message.chat.id]
-    except KeyError:
-        bot.send_message(message.chat.id, "Спочатку виконайте команду /start")
+    if not is_user_started(message):
         return
 
     user_responses[message.chat.id] = {}
@@ -223,36 +211,33 @@ def get_criteria(message):
 
 @bot.message_handler(content_types=["text"])
 def repeat_all_messages(message):
-    try:
-        user_responses[message.chat.id]
-    except KeyError:
-        bot.send_message(message.chat.id, "Спочатку виконайте команду /start")
+    if not is_user_started(message):
         return
 
     if message.text.lower() == "посада":
         bot.send_message(message.chat.id, "Введіть назву посади на яку Ви шукаєте кандидата")
         bot.register_next_step_handler(message, set_position)
-    if message.text.lower() == "локація":
+    elif message.text.lower() == "локація":
         bot.send_message(message.chat.id, "Введіть назву міста")
         bot.register_next_step_handler(message, set_location)
-    if message.text.lower() == "зарплата від":
+    elif message.text.lower() == "зарплата від":
         bot.send_message(
             message.chat.id,
             "Введіть мінімальне значення очікуваної зарплати кандидата в грн. "
             f"Доступні значення: {list(SALARY.keys())[1:]}",
         )
         bot.register_next_step_handler(message, set_salary_from)
-    if message.text.lower() == "зарплата до":
+    elif message.text.lower() == "зарплата до":
         bot.send_message(
             message.chat.id,
             "Введіть максимальне значення очікуваної зарплати кандидата в грн. "
             f"Доступні значення: {list(SALARY.keys())[1:]}",
         )
         bot.register_next_step_handler(message, set_salary_to)
-    if message.text.lower() == "досвід":
+    elif message.text.lower() == "досвід":
         bot.send_message(message.chat.id, "Введіть досвід кандидата у роках")
         bot.register_next_step_handler(message, set_experience)
-    if message.text.lower() == "ключові слова":
+    elif message.text.lower() == "ключові слова":
         bot.send_message(
             message.chat.id, "Введіть необхідні навички кандидата та ключові слова в резюме, перелік через кому"
         )
@@ -287,6 +272,16 @@ def set_experience(message):
 def set_keywords(message):
     user_responses[message.chat.id]["keywords"] = message.text.split(", ")
     bot.send_message(message.chat.id, f"Навички кандидата та ключові слова в резюме: {message.text}")
+
+
+def is_user_started(message):
+    try:
+        user_responses[message.chat.id]
+    except KeyError:
+        bot.send_message(message.chat.id, "Спочатку виконайте команду /start")
+        return False
+    else:
+        return True
 
 
 def run_bot():
